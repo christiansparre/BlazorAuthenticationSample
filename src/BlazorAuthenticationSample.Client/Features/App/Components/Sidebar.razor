@@ -1,0 +1,20 @@
+﻿<aside class="menu">
+    <p class="menu-label">
+        Something
+    </p>
+    <ul class="menu-list">
+        <li><a href="/this">This</a></li>
+        <li><a href="/that">And that</a></li>
+    </ul>
+    <AuthorizeView Policy="RequireAdmin">
+        <Authorized>
+            <p id="admin-menu-label" class="menu-label">
+                Administration
+            </p>
+            <ul id="admin-menu-list" class="menu-list">
+                <li><a href="/administration">Admin stuff</a></li>
+                <li><a href="/unlimitedpower">Assert your power!</a></li>
+            </ul>
+        </Authorized>
+    </AuthorizeView>
+</aside>

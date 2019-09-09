@@ -1,0 +1,86 @@
+﻿@page "/account/signin"
+@inject UserManager<IdentityUser> userManager
+@inject SignInManager<IdentityUser> signInManager
+@inject NavigationManager navigationManager
+@inject IDataProtectionProvider dataProtectionProvider
+@inject SignInRedirectContext signInRedirectContext
+
+<div class="container">
+    <h1 class="title">Sign in</h1>
+
+    <EditForm Model="@signInModel" OnValidSubmit="@RegisterUser">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="field">
+            <label class="label">E-mail</label>
+            <div class="control">
+                <InputText id="email" class="input" type="email" @bind-Value="@signInModel.Email"></InputText>
+            </div>
+        </div>
+        <div class="field">
+            <label class="label">Password</label>
+            <div class="control">
+                <InputText id="password" class="input" type="password" @bind-Value="@signInModel.Password"></InputText>
+            </div>
+        </div>
+        <div class="field">
+            <div class="control">
+                <button type="submit" class="button is-primary">Sign in</button>
+            </div>
+        </div>
+    </EditForm>
+
+    @if (showSignInError)
+    {
+        <div class="notification is-danger">
+            Sorry, wrong username or password
+        </div>
+    }
+
+</div>
+<div class="container">
+    <p>If you do not have an account register one <a href="/account/register">here</a>!</p>
+</div>
+@code {
+
+    private SignInModel signInModel = new SignInModel();
+    private bool showSignInError = false;
+
+    private async Task RegisterUser()
+    {
+        var user = await userManager.FindByEmailAsync(signInModel.Email);
+
+        if (user != null && await userManager.CheckPasswordAsync(user, signInModel.Password))
+        {
+            showSignInError = false;
+
+            var token = await userManager.GenerateUserTokenAsync(user, TokenOptions.DefaultProvider, "SignIn");
+
+            var data = $"{user.Id}|{token}";
+
+            if (!string.IsNullOrWhiteSpace(signInRedirectContext.ReturnUrl))
+            {
+                data += $"|{signInRedirectContext.ReturnUrl}";
+            }
+
+            var protector = dataProtectionProvider.CreateProtector("SignIn");
+
+            var pdata = protector.Protect(data);
+            
+            navigationManager.NavigateTo("/account/signinactual?t=" + pdata, forceLoad: true);
+        }
+        else
+        {
+            showSignInError = true;
+        }
+    }
+
+    public class SignInModel
+    {
+        [Required]
+        public string Email { get; set; }
+        [Required]
+        public string Password { get; set; }
+    }
+}

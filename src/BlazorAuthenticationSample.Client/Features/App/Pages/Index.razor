@@ -1,0 +1,13 @@
+﻿@page "/"
+@inject AuthenticationStateProvider authenticationStateProvider
+
+<h1 class="title">Hello, world!</h1>
+
+Welcome to your new app.
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        var state = await authenticationStateProvider.GetAuthenticationStateAsync();
+    }
+}
