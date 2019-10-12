@@ -1,6 +1,5 @@
 ﻿@inject AuthenticationStateProvider authenticationStateProvider
 @inject NavigationManager navigationManager
-@inject SignInRedirectContext signInRedirectContext
 
 @if (showNotAuthorizedMessage)
 {
@@ -24,9 +23,7 @@
         if (!state.User.Identity.IsAuthenticated)
         {
             // If the user is not authenticated redirect them to the sign in page
-
-            signInRedirectContext.ReturnUrl = new Uri(navigationManager.Uri).PathAndQuery;
-            navigationManager.NavigateTo("/account/signin");
+            navigationManager.NavigateTo("/account/signin?returnUrl=" + System.Net.WebUtility.UrlEncode(new Uri(navigationManager.Uri).PathAndQuery));
         }
         else
         {

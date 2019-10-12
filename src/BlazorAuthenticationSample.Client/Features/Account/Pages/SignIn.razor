@@ -3,7 +3,6 @@
 @inject SignInManager<IdentityUser> signInManager
 @inject NavigationManager navigationManager
 @inject IDataProtectionProvider dataProtectionProvider
-@inject SignInRedirectContext signInRedirectContext
 
 <div class="container">
     <h1 class="title">Sign in</h1>
@@ -59,15 +58,19 @@
 
             var data = $"{user.Id}|{token}";
 
-            if (!string.IsNullOrWhiteSpace(signInRedirectContext.ReturnUrl))
+            var parsedQuery = System.Web.HttpUtility.ParseQueryString(new Uri(navigationManager.Uri).Query);
+
+            var returnUrl = parsedQuery["returnUrl"];
+
+            if (!string.IsNullOrWhiteSpace(returnUrl))
             {
-                data += $"|{signInRedirectContext.ReturnUrl}";
+                data += $"|{returnUrl}";
             }
 
             var protector = dataProtectionProvider.CreateProtector("SignIn");
 
             var pdata = protector.Protect(data);
-            
+
             navigationManager.NavigateTo("/account/signinactual?t=" + pdata, forceLoad: true);
         }
         else
