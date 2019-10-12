@@ -1,14 +1,13 @@
+using BlazorAuthenticationSample.Client.Data;
+using BlazorAuthenticationSample.Client.Features.Identity;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using BlazorAuthenticationSample.Client.Data;
-using BlazorAuthenticationSample.Client.Features.Identity;
-using BlazorAuthenticationSample.Client.Features;
 
 namespace BlazorAuthenticationSample.Client
 {
@@ -46,8 +45,6 @@ namespace BlazorAuthenticationSample.Client
             services.AddControllers();
             services.AddServerSideBlazor();
             services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
-
-            services.AddSingleton<SignInRedirectContext>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, DbContextOptions<ApplicationDbContext> identityDbContextOptions, UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager)

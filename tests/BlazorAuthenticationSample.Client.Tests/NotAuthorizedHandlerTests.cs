@@ -1,13 +1,13 @@
-﻿using Microsoft.AspNetCore.Components.Testing;
-using Moq;
-using Xunit;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.Components.Authorization;
+﻿using System.Net;
 using System.Security.Claims;
-using Microsoft.AspNetCore.Components;
-using BlazorAuthenticationSample.Client.Features;
 using BlazorAuthenticationSample.Client.Features.Security.Components;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Components.Testing;
+using Microsoft.Extensions.DependencyInjection;
+using Moq;
 using Shouldly;
+using Xunit;
 
 namespace BlazorAuthenticationSample.Client.Tests
 {
@@ -16,14 +16,12 @@ namespace BlazorAuthenticationSample.Client.Tests
         private TestHost testHost = new TestHost();
         private Mock<AuthenticationStateProvider> _authenticationStateProvider;
         private TestNavigationManager _testNavigationManager;
-        private SignInRedirectContext _signInRedirectContext;
 
         public NotAuthorizedHandlerTests()
         {
             _authenticationStateProvider = new Mock<AuthenticationStateProvider>();
             _testNavigationManager = new TestNavigationManager();
             _testNavigationManager.SetInitialized();
-            _signInRedirectContext = new SignInRedirectContext();
 
             testHost.ConfigureServices(services =>
             {
@@ -32,7 +30,6 @@ namespace BlazorAuthenticationSample.Client.Tests
                 {
                     options.AddPolicy("RequireAdmin", c => c.RequireRole("Admin"));
                 });
-                services.AddSingleton<SignInRedirectContext>(_signInRedirectContext);
                 services.AddSingleton<NavigationManager>(_testNavigationManager);
                 services.AddSingleton<AuthenticationStateProvider>(_authenticationStateProvider.Object);
             });
@@ -46,18 +43,19 @@ namespace BlazorAuthenticationSample.Client.Tests
             var component = testHost.AddComponent<NotAuthorizedHandler>();
 
             var navigation = _testNavigationManager.Navigations.Pop();
-            navigation.uri.ShouldBe("/account/signin");
+            navigation.uri.ShouldBe($"/account/signin?returnUrl={WebUtility.UrlEncode("/test/test")}");
             navigation.forceLoad.ShouldBeFalse();
         }
 
         [Fact]
-        public void ShouldSetReturnUrlOnSignInRedirectContextIfNotAuthenticated()
+        public void ShouldIncludeReturnUrlInRedirectToSignInPageIfNotAuthenticated()
         {
             _authenticationStateProvider.Setup(s => s.GetAuthenticationStateAsync()).ReturnsAsync(new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity())));
 
             var component = testHost.AddComponent<NotAuthorizedHandler>();
 
-            _signInRedirectContext.ReturnUrl.ShouldBe("/test/test");
+            var nav = _testNavigationManager.Navigations.Pop();
+            nav.uri.ShouldEndWith($"?returnUrl={WebUtility.UrlEncode("/test/test")}");
         }
 
         [Fact]
