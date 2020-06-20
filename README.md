@@ -1,3 +1,5 @@
+*Not really maintaining this anymore, see https://docs.microsoft.com/en-us/aspnet/core/blazor/security/?view=aspnetcore-3.1 for the official ASP.NET Core Blazor authentication and authorization. It's quite comprehensive*
+
 # ASP.NET Core Blazor (Server side) Authentication Sample
 This sample shows some more "complex" and "real world" scenarios for handling `Authentication` and `Authorization` with ASP.NET Core server side Blazor.
 
